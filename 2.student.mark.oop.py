@@ -1,12 +1,7 @@
-# Create a list to add students, courses, mark
-Student_list = []
-Course_list = []
-Mark_list = []
-
 class Student:
-    def __init__ (self, student_name, student_id, DoB):
+    def __init__ (self, student_id, student_name, DoB):
+        self.student_id = student_id            
         self.student_name = student_name
-        self.student_id = student_id    
         self.DoB = DoB
 
 class Course:
@@ -23,7 +18,9 @@ class Mark:
 
 # Ask how many number of student and take student information      
 class StudentManager:
-    def students_information():
+    Student_list = []
+
+    def students_information(cls):
         s = int(input("Enter Number of Students: "))
         if s <= 0:
             print("Error")
@@ -33,22 +30,23 @@ class StudentManager:
             student_id = str(input("\nEnter Student %d ID: " %i))
             student_name = str(input("Enter Student %d Name: " %i))
             DoB = str(input("Enter Student %d DoB: " %i))
-            Student_list.append(Student(student_id, student_name, DoB))
+            cls.Student_list.append(Student(student_id, student_name, DoB))
 
 # Display list students
-    def list_students():
+    def list_students(cls):
         print("\nList Students ")
         num = 1
-        for student in Student_list:
+        for student in cls.Student_list:
             print(f"Student {num}. ID: {student.student_id}, Name: {student.student_name}, Dob: {student.DoB}")
             num = num + 1
 
 
 # Ask how many number of course and take course information
 class CourseManager:
-    def courses_information():
-        c = int(input("\nEnter Number of Courses: "))
+    Course_list = []
 
+    def courses_information(cls):
+        c = int(input("\nEnter Number of Courses: "))
         if c <= 0:
             print("Error")
             return
@@ -56,45 +54,47 @@ class CourseManager:
         for i in range (1,c + 1):
             course_id = str(input("\nEnter Course %d ID: " %i))
             course_name = str(input("Enter Couse %d Name: " %i))
-            Course_list.append(Course(course_id, course_name))
+            cls.Course_list.append(Course(course_id, course_name))
 
     # Display list courses
-    def list_courses():
+    def list_courses(cls):
         print("\nList Courses ")
         num = 1
-        for course in Course_list:
+        for course in cls.Course_list:
             print(f"Course {num}. ID: {course.course_id}, Name: {course.course_name}")
             num = num + 1
 
 # Select a course, input marks for student in this course
 class MarkManager:
-    def mark_information():
-        CourseManager.list_courses()
+    Mark_list = []
+
+    def mark_information(cls):
+        CourseManager.list_courses(CourseManager)
         course_name = str(input("Enter Course Name: "))
-        if course_name not in [course.course_name for course in Course_list]:
+        if course_name not in [course.course_name for course in CourseManager.Course_list]:
             print("Error")
             return    
         
-        StudentManager.list_students()
+        StudentManager.list_students(StudentManager)
         student_name = str(input("Enter Student Name: "))
-        if student_name not in [student.student_name for student in Student_list]:        
+        if student_name not in [student.student_name for student in StudentManager.Student_list]:        
             print("Error")
             return
         
         mark = float(input(f"Input Mark for {student_name} in {course_name}: "))
-        Mark_list.append(Mark(Student(student_name, "", ""), Course(course_name, ""), mark))
+        cls.Mark_list.append(Mark(Student(student_name, "", ""), Course(course_name, ""), mark))
 
     # Display list marks
-    def list_mark (Mark):
-        CourseManager.list_courses()
+    def list_mark (cls):
+        CourseManager.list_courses(CourseManager)
         course_name = str(input("Enter Course Name: "))
-        if course_name not in [course.course_name for course in Course_list]:
+        if course_name not in [course.course_name for course in CourseManager.Course_list]:
             print("Error")
             return
         
         print(f"\nList Marks for Course: {course_name}")
-        for mark_dict in Mark:        
-            if mark_dict.course_name == course_name:
+        for mark_dict in cls.Mark_list:        
+            if mark_dict.course.course_name == course_name:
                 student_name = mark_dict.student.student_name
                 mark = mark_dict.mark
                 print(f"Student Name: {student_name} \nMark: {mark}")
@@ -112,17 +112,17 @@ while True:
     choice = int(input("Choose: "))
 
     if choice == 1:
-        StudentManager.students_information()
+        StudentManager.students_information(StudentManager)
     elif choice == 2:
-        CourseManager.courses_information()
+        CourseManager.courses_information(CourseManager)
     elif choice == 3:
-        StudentManager.list_students()
+        StudentManager.list_students(StudentManager)
     elif choice == 4:
-        CourseManager.list_courses()
+        CourseManager.list_courses(CourseManager)
     elif choice == 5:
-        MarkManager.mark_information()  
+        MarkManager.mark_information(MarkManager)  
     elif choice == 6:
-        MarkManager.list_mark(Mark)  
+        MarkManager.list_mark(MarkManager)  
     elif choice == 7:
         exit()
     else:
