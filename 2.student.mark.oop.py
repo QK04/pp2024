@@ -81,23 +81,23 @@ class MarkManager:
             print("Error")
             return
         
+        course = next(course for course in CourseManager.Course_list if course.course_name == course_name)
+        student = next(student for student in StudentManager.Student_list if student.student_name == student_name)
+        
         mark = float(input(f"Input Mark for {student_name} in {course_name}: "))
-        cls.Mark_list.append(Mark(Student(student_name, "", ""), Course(course_name, ""), mark))
+        cls.Mark_list.append(Mark(student, course, mark))
 
     # Display list marks
     def list_mark (cls):
-        CourseManager.list_courses(CourseManager)
-        course_name = str(input("Enter Course Name: "))
-        if course_name not in [course.course_name for course in CourseManager.Course_list]:
-            print("Error")
-            return
-        
-        print(f"\nList Marks for Course: {course_name}")
-        for mark_dict in cls.Mark_list:        
-            if mark_dict.course.course_name == course_name:
-                student_name = mark_dict.student.student_name
-                mark = mark_dict.mark
-                print(f"Student Name: {student_name} \nMark: {mark}")
+        if not cls.Mark_list:
+            print("No marks available.")
+            return        
+         
+        print("List of Marks:")
+        for mark in cls.Mark_list:
+            student_name = mark.student.student_name
+            course_name = mark.course.course_name
+            print(f"Course: {course_name}, Student: {student_name}, Mark: {mark.mark}")
 
 # Main function:  Student Mark Management
 while True:
