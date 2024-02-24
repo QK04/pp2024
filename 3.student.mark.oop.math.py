@@ -1,5 +1,5 @@
 import math
-# import curses
+import curses
 import numpy as np
 
 class Student:
@@ -138,38 +138,50 @@ class GPA:
     
 
 # Main function:  Student Mark Management
-while True:
-    print("\n1. Input student information: id, name, DoB")
-    print("2. Input course information: id, name")
-    print("3. List students")
-    print("4. List courses")
-    print("5. Select a course, input marks for student in this course")
-    print("6. Show student marks for a given course")
-    print("7. Sorting students by GPA")
-    print("8. Exit")
 
-    choice = int(input("Choose: "))
+def main(stdscr):
+    
+    stdscr.clear()
+    stdscr.addstr(1, 2, "Welcome to Student Mark Management", curses.A_BOLD)
+    stdscr.addstr(3, 2, "1. Input student information: id, name, DoB", curses.A_UNDERLINE)
+    stdscr.addstr(4, 2, "2. Input course information: id, name", curses.A_UNDERLINE)
+    stdscr.addstr(5, 2, "3. List students", curses.A_UNDERLINE)
+    stdscr.addstr(6, 2, "4. List courses", curses.A_UNDERLINE)
+    stdscr.addstr(7, 2, "5. Select a course, input marks for student", curses.A_UNDERLINE)
+    stdscr.addstr(8, 4, "in this course", curses.A_UNDERLINE)  # Adjusted for longer string
+    stdscr.addstr(9, 2, "6. Show student marks for a given course", curses.A_UNDERLINE)
+    stdscr.addstr(10, 2, "7. Sorting students by GPA", curses.A_UNDERLINE)
+    stdscr.addstr(11, 2, "8. Exit\n", curses.A_UNDERLINE)
+    stdscr.refresh()
 
-    if choice == 1:
-        StudentManager.students_information(StudentManager)
-    elif choice == 2:
-        CourseManager.courses_information(CourseManager)
-    elif choice == 3:
-        StudentManager.list_students(StudentManager)
-    elif choice == 4:
-        CourseManager.list_courses(CourseManager)
-    elif choice == 5:
-        MarkManager.mark_information(MarkManager)  
-    elif choice == 6:
-        MarkManager.list_mark(MarkManager)  
-    elif choice == 7:
-        sorted_students = GPA.sorting(StudentManager.Student_list)   
-        for student in sorted_students:
-            print(f"ID: {student.student_id}, Name: {student.student_name}, GPA: {GPA.calculate_gpa(student)}")
-    elif choice == 8:
-        exit()
-    else:
-        print("Invalid choice.")
+    stdscr.keypad(True)
 
+    while True:
+        choice = stdscr.getch() 
 
+        if choice == ord('1'):
+            StudentManager.students_information(StudentManager)
+        elif choice == ord('2'):
+            CourseManager.courses_information(CourseManager)
+        elif choice == ord('3'):
+            StudentManager.list_students(StudentManager)
+        elif choice == ord('4'):
+            CourseManager.list_courses(CourseManager)
+        elif choice == ord('5'):
+            MarkManager.mark_information(MarkManager)  
+        elif choice == ord('6'):
+            MarkManager.list_mark(MarkManager) 
+        elif choice == ord('7'):
+            sorted_students = GPA.sorting(StudentManager.Student_list)
+            for student in sorted_students:
+                stdscr.addstr(f"ID: {student.student_id}, Name: {student.student_name}, GPA: {GPA.calculate_gpa(student)}\n")
+        elif choice == ord('8'):
+            break
+        else:
+            stdscr.addstr("Invalid choice.")
 
+        stdscr.refresh()
+
+    curses.endwin()
+
+curses.wrapper(main)
