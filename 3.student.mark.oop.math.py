@@ -1,16 +1,22 @@
 import math
-import curses
+# import curses
+import numpy as np
 
 class Student:
     def __init__ (self, student_id, student_name, DoB):
         self.student_id = student_id            
         self.student_name = student_name
         self.DoB = DoB
-
+        self.marks = []
+    
+    def add_mark(self, mark):
+        self.marks.append(mark)
+    
 class Course:
-    def __init__ (self, course_id, course_name):
+    def __init__ (self, course_id, course_name, credits):
         self.course_name = course_name
         self.course_id = course_id    
+        self.credits = credits
 
 class Mark:
     def __init__ (self, student, course, mark):
@@ -67,14 +73,15 @@ class CourseManager:
                     print("Already exist")
                     return
             course_name = str(input("Enter Couse %d Name: " %i))
-            cls.Course_list.append(Course(course_id, course_name))
+            credits = int(input("Enter Credits for Course %d: " %i))
+            cls.Course_list.append(Course(course_id, course_name, credits))
 
     # Display list courses
     def list_courses(cls):
         print("\nList Courses ")
         num = 1
         for course in cls.Course_list:
-            print(f"Course {num}. ID: {course.course_id}, Name: {course.course_name}")
+            print(f"Course {num}. ID: {course.course_id}, Name: {course.course_name}, Credits: {course.credits}")
             num = num + 1
 
 # Select a course, input marks for student in this course
@@ -98,8 +105,9 @@ class MarkManager:
         student = next(student for student in StudentManager.Student_list if student.student_name == student_name)
         
         mark = float(input(f"Input Mark for {student_name} in {course_name}: "))
-        round_down = math.floor(mark * 10/10)
+        round_down = math.floor(mark*10)/10
         cls.Mark_list.append(Mark(student, course, round_down))
+        student.marks.append(Mark(student, course, round_down))
 
     # Display list marks
     def list_mark (cls):
@@ -113,6 +121,22 @@ class MarkManager:
             course_name = mark.course.course_name
             print(f"Course: {course_name}, Student: {student_name}, Mark: {mark.mark}")
 
+
+class GPA:
+    def calculate_gpa(student):
+        if not student.marks:
+            return 0
+        
+        credits = np.array([mark.course.credits for mark in student.marks])
+        marks = np.array([mark.mark for mark in student.marks])
+        gpa = math.floor((np.sum(credits*marks) / np.sum(credits))*10)/10
+        return gpa
+    
+    def sorting(Student_list):
+        Student_list = sorted(Student_list, key=lambda student: GPA.calculate_gpa(student), reverse=True)
+        return Student_list
+    
+
 # Main function:  Student Mark Management
 while True:
     print("\n1. Input student information: id, name, DoB")
@@ -121,7 +145,8 @@ while True:
     print("4. List courses")
     print("5. Select a course, input marks for student in this course")
     print("6. Show student marks for a given course")
-    print("7. Exit")
+    print("7. Sorting students by GPA")
+    print("8. Exit")
 
     choice = int(input("Choose: "))
 
@@ -138,8 +163,13 @@ while True:
     elif choice == 6:
         MarkManager.list_mark(MarkManager)  
     elif choice == 7:
+        sorted_students = GPA.sorting(StudentManager.Student_list)   
+        for student in sorted_students:
+            print(f"ID: {student.student_id}, Name: {student.student_name}, GPA: {GPA.calculate_gpa(student)}")
+    elif choice == 8:
         exit()
     else:
         print("Invalid choice.")
+
 
 
