@@ -24,36 +24,63 @@ class Mark:
         self.course = course    
         self.mark = mark
 
+#initialize curse
+stdscr = curses.initscr()
+curses.noecho()
+curses.cbreak()
+stdscr.keypad(True)
+
+#Display a message
+def display_message(message):
+    stdscr.clear()
+    stdscr.addstr(0, 0, message)
+    stdscr.getch()
 
 # Ask how many number of student and take student information      
 class StudentManager:
     Student_list = []
 
     def students_information(cls):
-        s = int(input("Enter Number of Students: "))
+        stdscr.clear()
+        stdscr.addstr(0, 0, "Enter Number of Students: ")
+        stdscr.refresh()
+        s = int(stdscr.getstr().decode())
+
         if s <= 0:
-            print("Error")
+            display_message("Error")
             return
 
         for i in range (1,s + 1):
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Enter Student {i} ID: ")
+            stdscr.refresh()
+            student_id = stdscr.getstr().decode()
 
-            student_id = str(input("\nEnter Student %d ID: " %i))
-            for student in StudentManager.Student_list:
+            for student in cls.Student_list:
                 if student.student_id == student_id:
-                    print("Already exist")
+                    display_message("Already exist")
                     return      
                 
-            student_name = str(input("Enter Student %d Name: " %i))
-            DoB = str(input("Enter Student %d DoB: " %i))
+            stdscr.addstr(1, 0, f"Enter Student {i} Name: ")
+            stdscr.refresh()
+            student_name = stdscr.getstr().decode()
+
+            stdscr.addstr(2, 0, f"Enter Student {i} DoB: ")
+            stdscr.refresh()
+            DoB = stdscr.getstr().decode()
+
             cls.Student_list.append(Student(student_id, student_name, DoB))
 
 # Display list students
     def list_students(cls):
-        print("\nList Students ")
+        stdscr.clear()
+        stdscr.addstr(0, 0,"List Students ")
         num = 1
         for student in cls.Student_list:
-            print(f"Student {num}. ID: {student.student_id}, Name: {student.student_name}, Dob: {student.DoB}")
+            stdscr.addstr(num, 0, f"Student {num}. ID: {student.student_id}, Name: {student.student_name}, Dob: {student.DoB}")
             num = num + 1
+            stdscr.refresh()
+            stdscr.getch()
 
 
 # Ask how many number of course and take course information
@@ -61,28 +88,46 @@ class CourseManager:
     Course_list = []
 
     def courses_information(cls):
-        c = int(input("\nEnter Number of Courses: "))
+        stdscr.clear()
+        stdscr.addstr(0, 0, "Enter Number of Courses: ")
+        stdscr.refresh()
+        c = int(stdscr.getstr().decode())
+
         if c <= 0:
-            print("Error")
+            display_message("Error")
             return
 
         for i in range (1,c + 1):
-            course_id = str(input("\nEnter Course %d ID: " %i))
+            stdscr.clear()
+            stdscr.addstr(0, 0, f"Enter Course {i} ID: ")
+            stdscr.refresh()
+            course_id = stdscr.getstr().decode()
+    
             for course in CourseManager.Course_list:
                 if course.course_id == course_id:
-                    print("Already exist")
+                    display_message("Already exist")
                     return
-            course_name = str(input("Enter Couse %d Name: " %i))
-            credits = int(input("Enter Credits for Course %d: " %i))
+                
+            stdscr.addstr(1, 0, f"Enter Couse {i} Name: ")
+            stdscr.refresh()
+            course_name = stdscr.getstr().decode()
+
+            stdscr.addstr(2, 0, f"Enter Credits for Course {i}: ")
+            stdscr.refresh()
+            credits = int(stdscr.getstr().decode())
+
             cls.Course_list.append(Course(course_id, course_name, credits))
 
     # Display list courses
     def list_courses(cls):
-        print("\nList Courses ")
+        stdscr.clear()
+        stdscr.addstr(0, 0, "List Courses ")
         num = 1
         for course in cls.Course_list:
-            print(f"Course {num}. ID: {course.course_id}, Name: {course.course_name}, Credits: {course.credits}")
+            stdscr.addstr(num, 0, f"Course {num}. ID: {course.course_id}, Name: {course.course_name}, Credits: {course.credits}")
             num = num + 1
+        stdscr.refresh()
+        stdscr.getch()
 
 # Select a course, input marks for student in this course
 class MarkManager:
@@ -90,37 +135,47 @@ class MarkManager:
 
     def mark_information(cls):
         CourseManager.list_courses(CourseManager)
-        course_name = str(input("Enter Course Name: "))
+        stdscr.addstr(0,0, "Enter Course Name: ")
+        stdscr.refresh()
+        course_name = stdscr.getstr().decode()
+
         if course_name not in [course.course_name for course in CourseManager.Course_list]:
-            print("Error")
+            display_message("Error")
             return    
         
         StudentManager.list_students(StudentManager)
-        student_name = str(input("Enter Student Name: "))
+        stdscr.addstr(0,0, "Enter Student Name: ")
+        stdscr.refresh()
+        student_name = stdscr.getstr().decode()
+
         if student_name not in [student.student_name for student in StudentManager.Student_list]:        
-            print("Error")
+            display_message("Error")
             return
         
         course = next(course for course in CourseManager.Course_list if course.course_name == course_name)
         student = next(student for student in StudentManager.Student_list if student.student_name == student_name)
         
-        mark = float(input(f"Input Mark for {student_name} in {course_name}: "))
+        stdscr.addstr(0,0, f"Input Mark for {student_name} in {course_name}: ")
+        mark = float(stdscr.getstr().decode())
         round_down = math.floor(mark*10)/10
+
         cls.Mark_list.append(Mark(student, course, round_down))
         student.marks.append(Mark(student, course, round_down))
 
     # Display list marks
     def list_mark (cls):
+        stdscr.clear()
         if not cls.Mark_list:
-            print("No marks available.")
+            stdscr.addstr(0, 0, "No marks available.")
             return        
-         
-        print("List of Marks:")
-        for mark in cls.Mark_list:
-            student_name = mark.student.student_name
-            course_name = mark.course.course_name
-            print(f"Course: {course_name}, Student: {student_name}, Mark: {mark.mark}")
-
+        else:
+            stdscr.addstr(0,0, "List of Marks:")
+            for mark in cls.Mark_list:
+                student_name = mark.student.student_name
+                course_name = mark.course.course_name
+                stdscr.addstr(0, 0, f"Course: {course_name}, Student: {student_name}, Mark: {mark.mark}")
+        stdscr.refresh()
+        stdscr.getch()
 
 class GPA:
     def calculate_gpa(student):
@@ -140,48 +195,39 @@ class GPA:
 # Main function:  Student Mark Management
 
 def main(stdscr):
-    
-    stdscr.clear()
-    stdscr.addstr(1, 2, "Welcome to Student Mark Management", curses.A_BOLD)
-    stdscr.addstr(3, 2, "1. Input student information: id, name, DoB", curses.A_UNDERLINE)
-    stdscr.addstr(4, 2, "2. Input course information: id, name", curses.A_UNDERLINE)
-    stdscr.addstr(5, 2, "3. List students", curses.A_UNDERLINE)
-    stdscr.addstr(6, 2, "4. List courses", curses.A_UNDERLINE)
-    stdscr.addstr(7, 2, "5. Select a course, input marks for student", curses.A_UNDERLINE)
-    stdscr.addstr(8, 4, "in this course", curses.A_UNDERLINE)  # Adjusted for longer string
-    stdscr.addstr(9, 2, "6. Show student marks for a given course", curses.A_UNDERLINE)
-    stdscr.addstr(10, 2, "7. Sorting students by GPA", curses.A_UNDERLINE)
-    stdscr.addstr(11, 2, "8. Exit\n", curses.A_UNDERLINE)
-    stdscr.refresh()
-
-    stdscr.keypad(True)
-
     while True:
-        choice = stdscr.getch() 
+        stdscr.clear()
+        stdscr.addstr(1, 2, "1. Input student information: id, name, DoB")
+        stdscr.addstr(2, 2, "2. Input course information: id, name")
+        stdscr.addstr(3, 2, "3. List students")
+        stdscr.addstr(4, 2, "4. List courses")
+        stdscr.addstr(5, 2, "5. Select a course, input marks for student in this course")
+        stdscr.addstr(6, 2, "6. Show student marks for a given course")
+        stdscr.addstr(7, 2, "7. Sorting students by GPA")
+        stdscr.addstr(8, 2, "8. Exit")
+        stdscr.refresh()
 
-        if choice == ord('1'):
+        choice = stdscr.getch() - ord('0') 
+
+        if choice == 1:
             StudentManager.students_information(StudentManager)
-        elif choice == ord('2'):
+        elif choice == 2:
             CourseManager.courses_information(CourseManager)
-        elif choice == ord('3'):
+        elif choice == 3:
             StudentManager.list_students(StudentManager)
-        elif choice == ord('4'):
+        elif choice == 4:
             CourseManager.list_courses(CourseManager)
-        elif choice == ord('5'):
+        elif choice == 5:
             MarkManager.mark_information(MarkManager)  
-        elif choice == ord('6'):
+        elif choice == 6:
             MarkManager.list_mark(MarkManager) 
-        elif choice == ord('7'):
+        elif choice == 7:
             sorted_students = GPA.sorting(StudentManager.Student_list)
             for student in sorted_students:
                 stdscr.addstr(f"ID: {student.student_id}, Name: {student.student_name}, GPA: {GPA.calculate_gpa(student)}\n")
-        elif choice == ord('8'):
+        elif choice == 8:
             break
         else:
             stdscr.addstr("Invalid choice.")
-
-        stdscr.refresh()
-
-    curses.endwin()
 
 curses.wrapper(main)
