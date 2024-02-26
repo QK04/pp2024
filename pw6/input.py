@@ -4,7 +4,6 @@ import math
 import numpy as np
 import os
 import zipfile
-import pickle
 
 def get_int_input(stdscr, prompt):
     stdscr.clear()
@@ -52,7 +51,7 @@ class StudentManager:
 
             cls.Student_list.append(Student(student_id, student_name, DoB))
 
-        write_to_file("students.pkl", cls.Student_list)
+        write_to_file("Students.txt", '\n'.join([str(student) for student in cls.Student_list]))
 
 # Display list students
     def list_students(cls, stdscr):
@@ -100,7 +99,7 @@ class CourseManager:
 
             cls.Course_list.append(Course(course_id, course_name, credits))
         
-        write_to_file("courses.pkl", cls.Course_list)
+        write_to_file("Courses.txt", '\n'.join([str(course) for course in cls.Course_list]))
 
     # Display list courses
     def list_courses(cls, stdscr):
@@ -145,7 +144,7 @@ class MarkManager:
         cls.Mark_list.append(Mark(student, course, round_down))
         student.marks.append(Mark(student, course, round_down))
 
-        write_to_file("marks.pkl", cls.Mark_list)
+        write_to_file("Marks.txt", '\n'.join([str(mark) for mark in cls.Mark_list]))
 
     # Display list marks
     def list_mark (cls, stdscr):
@@ -179,32 +178,22 @@ class GPA:
         return Student_list
 
 def write_to_file(filename, data):
-    with open(filename,'ab') as file:
-        pickle.dump(data, file)
-
-def read_from_file(filename):
-    data = []
-    with open(filename, 'rb') as file:
-        try:
-            while True:
-                data.append(pickle.load(file))
-        except EOFError:
-            pass
-    return data
+    with open(filename,'a') as file:
+        file.write(data + '\n')
 
 def compress_file():    
     try:
-        with zipfile.ZipFile('student.zip','w') as zip:
-            zip.write('students.pkl')
-            zip.write('courses.pkl')
-            zip.write('marks.pkl')
+        with zipfile.ZipFile('student.dat','w') as zip:
+            zip.write('students.txt')
+            zip.write('courses.txt')
+            zip.write('marks.txt')
     except IOError as e:
         print(f"Error compressing files: {e}")
     
 def decompress_file():
-    if os.path.exists('students.zip'):
+    if os.path.exists('students.dat'):
         try:
-            with zipfile.ZipFile('students.zip','r') as zip:
+            with zipfile.ZipFile('students.dat','r') as zip:
                 zip.extractall('.')
         except IOError as e:
             print(f"Error decompressing files: {e}")  
@@ -214,7 +203,7 @@ def get_student_info(prompt):
     student_name = get_string_input(prompt, "Enter student name: ")
     DoB = get_string_input(prompt, "Enter DoB: ")
     student_info = f"{student_id}, {student_name}, {DoB}"
-    write_to_file("students.pkl", student_info)
+    write_to_file("students.txt", student_info)
     return student_info
 
 def get_course_info(prompt):
@@ -222,7 +211,7 @@ def get_course_info(prompt):
     course_name = get_string_input(prompt, "Enter course name: ")
     credits = get_string_input(prompt, "Enter credits: ")
     course_info = f"{course_id}, {course_name}, {credits}"
-    write_to_file("courses.pkl", course_info)
+    write_to_file("courses.txt", course_info)
     return course_info
 
 def get_mark_info(prompt):
@@ -230,6 +219,6 @@ def get_mark_info(prompt):
     student_name = get_string_input(prompt, "Enter student name: ")
     mark = get_int_input(prompt, "Enter mark: ")
     mark_info = f"{course_name}, {student_name}, {mark}"
-    write_to_file("marks.pkl", mark_info)
+    write_to_file("marks.txt", mark_info)
     return mark_info
 
