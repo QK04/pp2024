@@ -1,2 +1,0 @@
-Course ID: math, Name: toan, Credits: 4
-Course ID: bio, Name: sinh, Credits: 3
